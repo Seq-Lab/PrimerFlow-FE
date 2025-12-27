@@ -31,6 +31,8 @@
 * **Data Fetching:** SWR / TanStack Query
 * **Deployment:** Vercel
 
+## 🏗️ 프로젝트 구조 (Project Architecture)
+
 ```text
 primeflow-frontend/
 ├── .github/                 # Github Actions (CI/CD)
@@ -41,7 +43,7 @@ primeflow-frontend/
 │       ├── canvas_rendering.md
 │       ├── zoom_pan_logic.md
 │       └── api_integration.md
-|   └── strategy/
+|   └── strategy/            # 협업 가이드
 ├── src/
 │   ├── app/                 # Next.js App Router (페이지)
 │   │   ├── page.tsx         # 메인 대시보드
