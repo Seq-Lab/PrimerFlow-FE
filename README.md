@@ -6,7 +6,7 @@
 ![Vercel](https://img.shields.io/badge/Deployment-Vercel-black?logo=vercel)
 
 > **High-Performance PCR Primer Design & Visualization Platform**
-> 
+>
 > 대용량 유전자 서열(10,000bp+)을 웹 브라우저에서 지연 없이 분석하고 시각화하는 프론트엔드 엔진 리포지토리입니다.
 
 ## 📖 프로젝트 개요
@@ -34,45 +34,27 @@
 ## 🏗️ 프로젝트 구조 (Project Architecture)
 
 ```text
-primeflow-frontend/
-├── .github/                 # Github Actions (CI/CD)
-├── public/                  # 정적 파일 (Favicon, Logo 등)
-├── docs/                    # 📄 [핵심] 문서 및 프롬프트 저장소
-│   ├── api_specs/           # 백엔드와 합의된 JSON 데이터 명세
-│   └── prompts/             # AI에게 입력한 기능 명세서 (라이브러리화)
-│       ├── canvas_rendering.md
-│       ├── zoom_pan_logic.md
-│       └── api_integration.md
-|   └── strategy/            # 협업 가이드
-├── src/
-│   ├── app/                 # Next.js App Router (페이지)
-│   │   ├── page.tsx         # 메인 대시보드
-│   │   ├── layout.tsx       # 전체 레이아웃
-│   │   └── globals.css      # 전역 스타일 (Tailwind)
-│   ├── components/
-│   │   ├── canvas/          # 🎨 [핵심] 시각화 엔진 컴포넌트
-│   │   │   ├── GenomeCanvas.tsx   # 메인 캔버스 래퍼
-│   │   │   ├── TooltipLayer.tsx   # 마우스 오버 툴팁
-│   │   │   └── Controls.tsx       # 줌/팬 컨트롤러
-│   │   ├── ui/              # 공통 UI (Button, Input 등 - Shadcn/UI 추천)
-│   │   └── layout/          # Header, Sidebar 등
-│   ├── hooks/               # 커스텀 훅
-│   │   ├── useCanvas.ts     # Canvas Context 제어 훅
-│   │   └── useGenomeData.ts # 데이터 페칭 (SWR/TanStack Query)
-│   ├── lib/                 # 🧮 알고리즘 및 유틸 함수
-│   │   ├── math/            # 좌표 변환, 행렬 연산 (Affine Transform)
-│   │   ├── parsers/         # API 데이터 파싱
-│   │   └── algorithms/      # 프론트엔드용 최적화 (Binary Search, Greedy Layout)
-│   ├── store/               # 전역 상태 관리 (Zustand)
-│   │   └── useViewStore.ts  # 줌 레벨, 뷰포트 위치 상태
-│   ├── types/               # TypeScript 타입 정의
-│   │   └── api.ts           # 백엔드 데이터 인터페이스
-│   └── services/            # API 호출 함수 (Axios)
-├── .eslintrc.json
-├── next.config.js
-├── tailwind.config.ts
-├── tsconfig.json
-└── README.md
+PrimerFlow-FE/
+├── app/                  # 🌐 [Main] 페이지 및 라우팅 (Next.js App Router)
+│   ├── page.tsx          # 메인 대시보드 화면
+│   └── layout.tsx        # 전역 레이아웃 (Header, Font 등)
+│
+├── components/           # 🧩 UI 컴포넌트 모음
+│   ├── canvas/           # ✨ [Core] 시각화 엔진 (GenomeCanvas, Controls 등)
+│   └── ui/               # 공통 UI (Button, Input, Card 등)
+│
+├── lib/                  # 🧮 순수 함수 및 알고리즘
+│   ├── algorithms/       # [Optimization] 이분 탐색, 레이아웃 알고리즘
+│   ├── math/             # [Math] 좌표 변환(World <-> Screen), 행렬 연산
+│   └── parsers/          # [Data] FASTA 파싱 및 API 데이터 변환
+│
+├── store/                # 💾 전역 상태 관리 (Zustand)
+│   └── useViewStore.ts   # 줌 레벨, 뷰포트 위치 등 관리
+│
+├── docs/                 # 📄 문서 및 프롬프트 아카이브
+│   └── prompts/          # AI 개발을 위한 기능 명세서(Spec) 모음
+│
+└── public/               # 🖼️ 정적 파일 (이미지, 아이콘)
 ```
 
 ## 🚀 시작하기 (Getting Started)
