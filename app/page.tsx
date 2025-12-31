@@ -104,9 +104,10 @@ export default function Home() {
             viewState={viewState}
             onViewStateChange={setViewState}
             onDraw={(ctx, _canvas, renderState) => {
-              const { data, viewport } = renderState;
+              const { data, viewport, viewState } = renderState;
               if (!data) return;
 
+              ctx.setTransform(1, 0, 0, 1, 0, 0);
               ctx.fillStyle = "#f8fafc";
               ctx.fillRect(0, 0, viewport.width, viewport.height);
 
@@ -114,7 +115,13 @@ export default function Home() {
               const headerY = 28;
               const trackStartY = 64;
               const trackGap = 28;
-              const bpScale = createBpScale(data.length, viewport.width, paddingX);
+              const bpScale = createBpScale(data.length, viewport.width - paddingX * 2, 0);
+              const toScreenX = (bp: number) =>
+                paddingX + viewState.offsetX + bpScale.bpToX(bp) * viewState.scale;
+              const toScreenWidth = (start: number, end: number) => {
+                const rawWidth = bpScale.spanToWidth(start, end, 0) * viewState.scale;
+                return Math.max(2, rawWidth);
+              };
 
               ctx.fillStyle = "#0f172a";
               ctx.font = "600 14px ui-sans-serif, system-ui";
@@ -133,7 +140,7 @@ export default function Home() {
                 ctx.stroke();
               }
 
-              let y = trackStartY;
+              let y = trackStartY + viewState.offsetY;
 
               data.tracks.forEach((track) => {
                 const trackHeight = track.height ?? 18;
@@ -149,8 +156,8 @@ export default function Home() {
                 ctx.stroke();
 
                 track.features.forEach((feature) => {
-                  const x = bpScale.bpToX(feature.start);
-                  const width = bpScale.spanToWidth(feature.start, feature.end);
+                  const x = toScreenX(feature.start);
+                  const width = toScreenWidth(feature.start, feature.end);
                   const radius = Math.min(6, trackHeight / 2);
 
                   ctx.fillStyle = feature.color ?? "#38bdf8";
