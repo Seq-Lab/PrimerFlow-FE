@@ -26,6 +26,7 @@ Fix any runtime/type errors introduced in the page, including lack of CanvasRend
 - `ctx.roundRect` 미지원 이슈를 커스텀 라운드 사각형 유틸로 대체
 - Zustand selector의 `state` 타입 명시로 TS7006 해결
 - 줌/패닝 시 텍스트가 함께 스케일되는 문제를 해결하도록 캔버스 그리기 로직을 조정
+- 캔버스 높이에 맞춰 레이아웃 스케일을 적용해 텍스트/트랙/간격의 가독성 개선
 
 ## 4. 결과 및 적용 (Result)
 
@@ -34,3 +35,4 @@ Fix any runtime/type errors introduced in the page, including lack of CanvasRend
 - `lib/math/coords.ts`에 좌표 변환 유틸 추가 및 적용
 - 오류 수정: `roundRect` 대체, selector 타입 지정
 - 줌/패닝 시 텍스트는 고정 크기로 유지되고, 트랙/피처만 변환되도록 분리 렌더링 적용
+- 캔버스가 큰 경우에도 정보 영역이 작게 보이지 않도록 높이 기반 스케일링 적용

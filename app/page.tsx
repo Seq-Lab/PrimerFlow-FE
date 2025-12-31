@@ -98,23 +98,25 @@ export default function Home() {
             </button>
           </div>
           <GenomeCanvas
-            width={900}
-            height={240}
             genome={genome}
             viewState={viewState}
             onViewStateChange={setViewState}
+            className="w-full"
+            style={{ height: "clamp(260px, 45vh, 420px)" }}
             onDraw={(ctx, _canvas, renderState) => {
               const { data, viewport, viewState } = renderState;
               if (!data) return;
 
-              ctx.setTransform(1, 0, 0, 1, 0, 0);
+              const dpr = viewport.devicePixelRatio || 1;
+              ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
               ctx.fillStyle = "#f8fafc";
               ctx.fillRect(0, 0, viewport.width, viewport.height);
 
               const paddingX = 20;
-              const headerY = 28;
-              const trackStartY = 64;
-              const trackGap = 28;
+              const layoutScale = Math.min(1.4, Math.max(1, viewport.height / 200));
+              const headerY = 28 * layoutScale;
+              const trackStartY = 64 * layoutScale;
+              const trackGap = 28 * layoutScale;
               const bpScale = createBpScale(data.length, viewport.width - paddingX * 2, 0);
               const toScreenX = (bp: number) =>
                 paddingX + viewState.offsetX + bpScale.bpToX(bp) * viewState.scale;
@@ -124,18 +126,22 @@ export default function Home() {
               };
 
               ctx.fillStyle = "#0f172a";
-              ctx.font = "600 14px ui-sans-serif, system-ui";
-              ctx.fillText(`Genome length`, paddingX, headerY - 6);
+              ctx.font = `600 ${14 * layoutScale}px ui-sans-serif, system-ui`;
+              ctx.fillText(`Genome length`, paddingX, headerY - 6 * layoutScale);
               ctx.fillStyle = "#475569";
-              ctx.font = "12px ui-sans-serif, system-ui";
-              ctx.fillText(`${data.length.toLocaleString()} bp`, paddingX, headerY + 10);
+              ctx.font = `${12 * layoutScale}px ui-sans-serif, system-ui`;
+              ctx.fillText(
+                `${data.length.toLocaleString()} bp`,
+                paddingX,
+                headerY + 10 * layoutScale,
+              );
 
               ctx.strokeStyle = "#e2e8f0";
               ctx.lineWidth = 1;
               for (let i = 0; i <= 10; i += 1) {
                 const x = paddingX + i * ((viewport.width - paddingX * 2) / 10);
                 ctx.beginPath();
-                ctx.moveTo(x, trackStartY - 16);
+                ctx.moveTo(x, trackStartY - 16 * layoutScale);
                 ctx.lineTo(x, viewport.height - 20);
                 ctx.stroke();
               }
@@ -143,11 +149,11 @@ export default function Home() {
               let y = trackStartY + viewState.offsetY;
 
               data.tracks.forEach((track) => {
-                const trackHeight = track.height ?? 18;
+                const trackHeight = (track.height ?? 18) * layoutScale;
 
                 ctx.fillStyle = "#64748b";
-                ctx.font = "12px ui-sans-serif, system-ui";
-                ctx.fillText(track.name ?? track.id, paddingX, y - 10);
+                ctx.font = `${12 * layoutScale}px ui-sans-serif, system-ui`;
+                ctx.fillText(track.name ?? track.id, paddingX, y - 10 * layoutScale);
 
                 ctx.strokeStyle = "#e5e7eb";
                 ctx.beginPath();
@@ -165,23 +171,34 @@ export default function Home() {
                   ctx.fill();
 
                   if (feature.label) {
-                    const labelPaddingX = 6;
-                    const labelPaddingY = 3;
-                    ctx.font = "600 11px ui-sans-serif, system-ui";
+                    const labelPaddingX = 6 * layoutScale;
+                    const labelPaddingY = 3 * layoutScale;
+                    ctx.font = `600 ${11 * layoutScale}px ui-sans-serif, system-ui`;
                     const metrics = ctx.measureText(feature.label);
                     const labelWidth = metrics.width + labelPaddingX * 2;
-                    const labelHeight = 16 + labelPaddingY;
-                    const labelX = x + 6;
-                    const labelY = y + trackHeight + 6;
+                    const labelHeight = 16 * layoutScale + labelPaddingY;
+                    const labelX = x + 6 * layoutScale;
+                    const labelY = y + trackHeight + 6 * layoutScale;
 
                     ctx.fillStyle = "#ffffff";
                     ctx.strokeStyle = "#e2e8f0";
-                    drawRoundedRect(ctx, labelX, labelY, labelWidth, labelHeight, 6);
+                    drawRoundedRect(
+                      ctx,
+                      labelX,
+                      labelY,
+                      labelWidth,
+                      labelHeight,
+                      6 * layoutScale,
+                    );
                     ctx.fill();
                     ctx.stroke();
 
                     ctx.fillStyle = "#0f172a";
-                    ctx.fillText(feature.label, labelX + labelPaddingX, labelY + 12);
+                    ctx.fillText(
+                      feature.label,
+                      labelX + labelPaddingX,
+                      labelY + 12 * layoutScale,
+                    );
                   }
                 });
 

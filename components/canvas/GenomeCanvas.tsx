@@ -40,8 +40,6 @@ export type GenomeCanvasRenderState = {
 };
 
 export type GenomeCanvasProps = {
-  width?: number;
-  height?: number;
   className?: string;
   style?: CSSProperties;
   genome?: GenomeData;
@@ -64,8 +62,6 @@ const DEFAULT_VIEW_STATE: GenomeCanvasViewState = {
 };
 
 export default function GenomeCanvas({
-  width = 800,
-  height = 200,
   className,
   style,
   genome,
@@ -76,7 +72,9 @@ export default function GenomeCanvas({
   onViewStateChange,
   onDraw,
 }: GenomeCanvasProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [viewport, setViewport] = useState({ width: 0, height: 0 });
   // 패닝 중 불필요한 리렌더를 막기 위해 포인터 상태를 렌더 밖에서 관리합니다.
   const isPanningRef = useRef(false);
   const lastPointerRef = useRef<{ x: number; y: number } | null>(null);
@@ -98,18 +96,35 @@ export default function GenomeCanvas({
   );
 
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      if (!entries || entries.length === 0) return;
+      const { width, height } = entries[0].contentRect;
+      setViewport({ width, height });
+    });
+
+    resizeObserver.observe(container);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const { width, height } = viewport;
+
+    if (width === 0 || height === 0) return;
+
     // HiDPI에서 선이 선명하도록 디바이스 픽셀 비율로 렌더링합니다.
     const devicePixelRatio = window.devicePixelRatio || 1;
     canvas.width = Math.max(1, Math.floor(width * devicePixelRatio));
     canvas.height = Math.max(1, Math.floor(height * devicePixelRatio));
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
 
     ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
     ctx.clearRect(0, 0, width, height);
@@ -131,7 +146,7 @@ export default function GenomeCanvas({
 
     onDraw?.(ctx, canvas, renderState);
     ctx.restore();
-  }, [activeViewState, genome, height, onDraw, width]);
+  }, [activeViewState, genome, viewport, onDraw]);
 
   const handlePointerDown = useCallback(
     (event: PointerEvent<HTMLCanvasElement>) => {
@@ -190,15 +205,25 @@ export default function GenomeCanvas({
   );
 
   return (
-    <canvas
-      ref={canvasRef}
+    <div
+      ref={containerRef}
       className={className}
-      style={{ touchAction: "none", ...style }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
-      onWheel={handleWheel}
-    />
+      style={{ width: "100%", height: "400px", ...style }}
+    >
+      <canvas
+        ref={canvasRef}
+        style={{
+          display: "block",
+          width: "100%",
+          height: "100%",
+          touchAction: "none",
+        }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onWheel={handleWheel}
+      />
+    </div>
   );
 }
