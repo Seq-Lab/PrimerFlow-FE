@@ -72,16 +72,18 @@ git clone [https://github.com/Seq-Lab/PrimerFlow-FE.git](https://github.com/Seq-
 # 2. 프로젝트 폴더로 이동
 cd PrimerFlow-FE
 
-# 3. 패키지 설치
+# 3. 패키지 설치 (의존성 포함)
 npm install
 
 # 4. 상태 관리 라이브러리 설치 (Zustand)
 npm install zustand
 
 # 5. 환경 변수 설정 (.env.local 생성)
-# (백엔드 API 주소 설정 예시)
+# (백엔드 API 주소 설정 예시 - 실제 포트/호스트에 맞게 수정)
 # echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > .env.local
 
 # 6. 개발 서버 실행
 npm run dev
 ```
+
+브라우저에서 `http://localhost:3000`에 접속합니다. 포트가 변경된 경우 터미널에 출력된 주소로 접속하세요.
