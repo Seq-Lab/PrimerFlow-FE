@@ -75,10 +75,13 @@ cd PrimerFlow-FE
 # 3. 패키지 설치
 npm install
 
-# 4. 환경 변수 설정 (.env.local 생성)
+# 4. 상태 관리 라이브러리 설치 (Zustand)
+npm install zustand
+
+# 5. 환경 변수 설정 (.env.local 생성)
 # (백엔드 API 주소 설정 예시)
 # echo "NEXT_PUBLIC_API_URL=http://localhost:8000" > .env.local
 
-# 5. 개발 서버 실행
+# 6. 개발 서버 실행
 npm run dev
 ```
