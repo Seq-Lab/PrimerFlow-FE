@@ -776,7 +776,8 @@ ATGCGT..."
                                 : "bg-slate-800/80 text-white hover:bg-slate-800"
                         }`}
                     >
-                        {"<- Back"}
+                        <span className="material-icons text-white text-[20px]">arrow_back</span>
+                        <span>Back</span>
                     </button>
                     {!isLastStep && (
                         <button
@@ -786,7 +787,7 @@ ATGCGT..."
                         >
                             <div className="relative z-10 flex items-center justify-center gap-3">
                                 <span className="text-base font-bold text-white tracking-wide">Next</span>
-                                <span className="text-white text-[20px]">-&gt;</span>
+                                <span className="material-icons text-white text-[20px]">arrow_forward</span>
                             </div>
                             <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />
                         </button>
