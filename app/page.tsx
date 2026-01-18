@@ -7,6 +7,7 @@ import Step1TemplateEssential from "@/components/steps/Step1TemplateEssential";
 import Step2PrimerProperties from "@/components/steps/Step2PrimerProperties";
 import Step3BindingLocation from "@/components/steps/Step3BindingLocation";
 import Step4SpecificityPreview from "@/components/steps/Step4SpecificityPreview";
+import PrimerDesignTrigger from "@/components/PrimerDesignTrigger";
 import WizardFooterNav from "@/components/ui/WizardFooterNav";
 import WizardHeader from "@/components/ui/WizardHeader";
 
@@ -85,6 +86,7 @@ export default function Home() {
                         onResetView={resetViewState}
                     />
                 )}
+                {step === 4 && <PrimerDesignTrigger />}
                 <WizardFooterNav
                     step={step}
                     isLastStep={isLastStep}
