@@ -137,7 +137,7 @@ npm run dev
     ![week3_screenshot#4.png](docs/screenshots/week3_screenshot%234.png)
 - 다음 주 계획: 실제 데이터 연동, GenomeCanvas 미리보기·컨트롤 마무리.
 
-### Week 4 (26.01.05 ~ 26.01.11)
+### Week 4 (26.01.12 ~ 26.01.18)
 - 작업 내역:
   - 백엔드 모킹 서비스 구현 및 결과 시각화
   - Step 1 시퀀스 입력 편의성 개선
