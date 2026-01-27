@@ -228,16 +228,15 @@ export default function Step4SpecificityPreview({
 
                                 let y = trackStartY + viewState.offsetY;
 
-                                data.tracks.forEach((track) => {
+                                const tracks = Array.isArray(data.tracks) ? data.tracks : [];
+
+                                tracks.forEach((track) => {
                                     const trackHeight = (track.height ?? 18) * layoutScale;
 
                                     ctx.fillStyle = "#a5b4d8";
                                     ctx.font = `${12 * layoutScale}px ui-sans-serif, system-ui`;
-                                    ctx.fillText(
-                                        track.name ?? track.id,
-                                        paddingX,
-                                        y - 10 * layoutScale,
-                                    );
+                                    const trackLabel = track.name ?? track.id ?? "Track";
+                                    ctx.fillText(trackLabel, paddingX, y - 10 * layoutScale);
 
                                     ctx.strokeStyle = "#23324a";
                                     ctx.beginPath();
@@ -248,12 +247,15 @@ export default function Step4SpecificityPreview({
                                     );
                                     ctx.stroke();
 
-                                    track.features.forEach((feature) => {
-                                        const x = toScreenX(feature.start);
-                                        const width = toScreenWidth(
-                                            feature.start,
-                                            feature.end,
-                                        );
+                                    const features = Array.isArray(track.features)
+                                        ? track.features
+                                        : [];
+
+                                    features.forEach((feature) => {
+                                        const start = Number(feature.start ?? feature.start_bp ?? 0);
+                                        const end = Number(feature.end ?? feature.end_bp ?? start);
+                                        const x = toScreenX(start);
+                                        const width = toScreenWidth(start, end);
                                         const radius = Math.min(6, trackHeight / 2);
 
                                         ctx.fillStyle = feature.color ?? "#38bdf8";
@@ -267,11 +269,17 @@ export default function Step4SpecificityPreview({
                                         );
                                         ctx.fill();
 
-                                        if (feature.label) {
+                                        const label =
+                                            feature.label ||
+                                            feature.id ||
+                                            feature.name ||
+                                            "";
+
+                                        if (label) {
                                             const labelPaddingX = 6 * layoutScale;
                                             const labelPaddingY = 3 * layoutScale;
                                             ctx.font = `600 ${11 * layoutScale}px ui-sans-serif, system-ui`;
-                                            const metrics = ctx.measureText(feature.label);
+                                            const metrics = ctx.measureText(label);
                                             const labelWidth =
                                                 metrics.width + labelPaddingX * 2;
                                             const labelHeight =
@@ -294,7 +302,7 @@ export default function Step4SpecificityPreview({
 
                                             ctx.fillStyle = "#e2e8f0";
                                             ctx.fillText(
-                                                feature.label,
+                                                label,
                                                 labelX + labelPaddingX,
                                                 labelY + 12 * layoutScale,
                                             );

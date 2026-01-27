@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import GenomeCanvas from "@/components/canvas/GenomeCanvas";
-import type { AnalyzeResponse } from "@/lib/api/analysisService";
+import type { PrimerDesignResponseUI } from "@/types/analysis";
 import type { GenomeCanvasViewState, GenomeData } from "@/lib/types/Genome";
 
 interface PrimerResultModalProps {
     isOpen: boolean;
-    apiResult: AnalyzeResponse | null;
+    apiResult: PrimerDesignResponseUI | null;
     genome: GenomeData | null;
     onClose: () => void;
 }
@@ -174,12 +174,15 @@ export default function PrimerResultModal({
 
                                 let y = trackStartY + canvasViewState.offsetY;
 
-                                data.tracks.forEach((track) => {
+                                const tracks = Array.isArray(data.tracks) ? data.tracks : [];
+
+                                tracks.forEach((track) => {
                                     const trackHeight = (track.height ?? 18) * layoutScale;
 
                                     ctx.fillStyle = "#a5b4d8";
                                     ctx.font = `${12 * layoutScale}px ui-sans-serif, system-ui`;
-                                    ctx.fillText(track.name ?? track.id, paddingX, y - 10 * layoutScale);
+                                    const trackLabel = track.name ?? track.id ?? "Track";
+                                    ctx.fillText(trackLabel, paddingX, y - 10 * layoutScale);
 
                                     ctx.strokeStyle = "#23324a";
                                     ctx.beginPath();
@@ -187,9 +190,15 @@ export default function PrimerResultModal({
                                     ctx.lineTo(viewport.width - paddingX, y + trackHeight / 2);
                                     ctx.stroke();
 
-                                    track.features.forEach((feature) => {
-                                        const x = bpToX(feature.start);
-                                        const width = toScreenWidth(feature.start, feature.end);
+                                    const features = Array.isArray(track.features)
+                                        ? track.features
+                                        : [];
+
+                                    features.forEach((feature) => {
+                                        const start = Number(feature.start ?? feature.start_bp ?? 0);
+                                        const end = Number(feature.end ?? feature.end_bp ?? start);
+                                        const x = bpToX(start);
+                                        const width = toScreenWidth(start, end);
                                         const radius = Math.min(6, trackHeight / 2);
 
                                         ctx.fillStyle = feature.color ?? "#38bdf8";
@@ -214,11 +223,17 @@ export default function PrimerResultModal({
                                         drawRoundedRect(ctx, x, y, width, trackHeight, radius);
                                         ctx.fill();
 
-                                        if (feature.label) {
+                                        const label =
+                                            feature.label ||
+                                            feature.id ||
+                                            feature.name ||
+                                            "";
+
+                                        if (label) {
                                             const labelPaddingX = 6 * layoutScale;
                                             const labelPaddingY = 3 * layoutScale;
                                             ctx.font = `600 ${11 * layoutScale}px ui-sans-serif, system-ui`;
-                                            const metrics = ctx.measureText(feature.label);
+                                            const metrics = ctx.measureText(label);
                                             const labelWidth = metrics.width + labelPaddingX * 2;
                                             const labelHeight = 16 * layoutScale + labelPaddingY;
                                             const labelX = x + 6 * layoutScale;
@@ -238,11 +253,7 @@ export default function PrimerResultModal({
                                             ctx.stroke();
 
                                             ctx.fillStyle = "#e2e8f0";
-                                            ctx.fillText(
-                                                feature.label,
-                                                labelX + labelPaddingX,
-                                                labelY + 12 * layoutScale,
-                                            );
+                                            ctx.fillText(label, labelX + labelPaddingX, labelY + 12 * layoutScale);
                                         }
                                     });
 

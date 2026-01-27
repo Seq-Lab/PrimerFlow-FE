@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import PrimerResultModal from "@/components/PrimerResultModal";
-import { analyzeGenome, type AnalyzeRequest, type AnalyzeResponse } from "@/lib/api/analysisService";
+import {
+    analyzeGenome,
+    type AnalyzeRequestInput,
+} from "@/services/analysisService";
+import type { PrimerDesignResponseUI } from "@/types/analysis";
 import { demoGenome } from "@/lib/mocks/demoGenome";
 import type { GenomeData } from "@/lib/types/Genome";
 import { useViewStore } from "@/store/useViewStore";
@@ -31,19 +35,16 @@ const isGenomeData = (data: any): data is GenomeData =>
             track.features.every(isGenomeFeature),
     );
 
-const toGenomeDataFromResponse = (
-    response: AnalyzeResponse | null,
-    fallback: GenomeData,
-): GenomeData => {
-    if (!response) return fallback;
-    const details = response.details;
-    if (details && typeof details === "object") {
-        const candidate = (details as any).genome ?? details;
-        if (isGenomeData(candidate)) {
-            return candidate;
-        }
-    }
-    return fallback;
+const toGenomeDataFromResponse = (response: PrimerDesignResponseUI | null): GenomeData | null => {
+    if (!response?.genome) return null;
+    const g = response.genome as any;
+    const length =
+        g.length ??
+        g.length_bp ??
+        g.sequence?.length ??
+        0;
+    const tracks = Array.isArray(g.tracks) ? g.tracks : [];
+    return { length, tracks };
 };
 
 export default function Home() {
@@ -61,8 +62,8 @@ export default function Home() {
     const handleZoomOut = () =>
         setViewState({ ...viewState, scale: clampScale(viewState.scale / zoomStep) });
 
-    // 더미 genome 데이터
-    const genome = demoGenome;
+    const [resultGenome, setResultGenome] = useState<GenomeData | null>(null);
+    const [sequenceInput, setSequenceInput] = useState("");
 
     const steps = [
         { id: 1, label: "Template & Essential" },
@@ -73,10 +74,9 @@ export default function Home() {
 
     const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
     const [isLoading, setIsLoading] = useState(false);
-    const [apiResult, setApiResult] = useState<AnalyzeResponse | null>(null);
+    const [apiResult, setApiResult] = useState<PrimerDesignResponseUI | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [resultGenome, setResultGenome] = useState<GenomeData | null>(null);
     const totalSteps = steps.length;
     const handleStepChange = (next: number) => {
         const clamped = Math.min(Math.max(next, 1), totalSteps) as 1 | 2 | 3 | 4;
@@ -86,18 +86,41 @@ export default function Home() {
     const handleBack = () => handleStepChange(step - 1);
     const isLastStep = step === totalSteps;
 
-    const trackCount = genome.tracks.length;
-    const featureCount = genome.tracks.reduce(
+    const previewGenome = demoGenome;
+    const trackCount = previewGenome.tracks.length;
+    const featureCount = previewGenome.tracks.reduce(
         (count, track) => count + track.features.length,
         0,
     );
 
     const handleGenerate = async () => {
-        const payload: AnalyzeRequest = {
-            target_sequence: "ATGCGTACGTAGCTAGCTAGCTAGCTAATGCGTACGTAGCTAGCTAGCTAGCTA",
+        const targetSeq =
+            sequenceInput && sequenceInput.trim().length > 0
+                ? sequenceInput.trim()
+                : "ATGCGTACGTAGCTAGCTAGCTAGCTAATGCGTACGTAGCTAGCTAGCTAGCTA";
+        const payload: AnalyzeRequestInput = {
+            target_sequence: targetSeq,
             species: "Homo sapiens",
             analysis_type: "primer_generation",
             notes: "UI mock request while backend is offline",
+            product_size_min: 100,
+            product_size_max: 300,
+            tm_min: 57,
+            tm_opt: 60,
+            tm_max: 63,
+            gc_content_min: 40,
+            gc_content_max: 60,
+            max_tm_difference: 1,
+            gc_clamp: true,
+            max_poly_x: 5,
+            concentration: 50,
+            check_enabled: true,
+            splice_variant_handling: false,
+            snp_handling: false,
+            mispriming_library: false,
+            end_mismatch_region_size: 5,
+            end_mismatch_min_mismatch: 1,
+            search_start: 1,
         };
 
         setIsLoading(true);
@@ -106,8 +129,8 @@ export default function Home() {
         try {
             const result = await analyzeGenome(payload);
             setApiResult(result);
-            const genomeFromApi = toGenomeDataFromResponse(result, demoGenome);
-            setResultGenome(genomeFromApi);
+            const genomeFromApi = toGenomeDataFromResponse(result);
+            setResultGenome(genomeFromApi ?? null);
             setIsModalOpen(true);
         } catch (error) {
             const message =
@@ -134,7 +157,7 @@ export default function Home() {
 
             <main className="relative mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-10 lg:px-10">
                 <WizardHeader
-                    genomeLength={genome.length}
+                    genomeLength={previewGenome.length}
                     trackCount={trackCount}
                     featureCount={featureCount}
                     steps={steps}
@@ -142,7 +165,12 @@ export default function Home() {
                     onStepChange={handleStepChange}
                 />
 
-                {step === 1 && <Step1TemplateEssential />}
+                {step === 1 && (
+                    <Step1TemplateEssential
+                        sequence={sequenceInput}
+                        onSequenceChange={setSequenceInput}
+                    />
+                )}
 
                 {step === 2 && <Step2PrimerProperties />}
 
@@ -150,7 +178,7 @@ export default function Home() {
 
                 {step === 4 && (
                     <Step4SpecificityPreview
-                        genome={genome}
+                        genome={previewGenome}
                         viewState={viewState}
                         onViewStateChange={setViewState}
                         onZoomIn={handleZoomIn}
