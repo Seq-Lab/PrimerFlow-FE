@@ -1,17 +1,24 @@
 "use client";
 
-import { type ChangeEvent, useMemo, useRef, useState } from "react";
+import { type ChangeEvent, useMemo, useRef } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import TextareaAutosize from "react-textarea-autosize";
 
-export default function Step1TemplateEssential() {
+type Step1TemplateEssentialProps = {
+    sequence: string;
+    onSequenceChange: (value: string) => void;
+};
+
+export default function Step1TemplateEssential({
+    sequence,
+    onSequenceChange,
+}: Step1TemplateEssentialProps) {
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-    const [sequenceInput, setSequenceInput] = useState("");
 
     const basePairCount = useMemo(
-        () => sequenceInput.replace(/[^A-Za-z]/g, "").length,
-        [sequenceInput],
+        () => sequence.replace(/[^A-Za-z]/g, "").length,
+        [sequence],
     );
 
     const focusTextarea = () => textareaRef.current?.focus();
@@ -24,7 +31,7 @@ export default function Step1TemplateEssential() {
             return;
         }
 
-        setSequenceInput((prev) => (prev ? `${prev}\n${sanitized}` : sanitized));
+        onSequenceChange(sequence ? `${sequence}\n${sanitized}` : sanitized);
         focusTextarea();
     };
 
@@ -60,7 +67,7 @@ export default function Step1TemplateEssential() {
     };
 
     const handleCleanClick = () => {
-        setSequenceInput("");
+        onSequenceChange("");
         focusTextarea();
     };
 
@@ -96,8 +103,8 @@ export default function Step1TemplateEssential() {
                                 spellCheck={false}
                                 minRows={10}
                                 maxRows={20}
-                                value={sequenceInput}
-                                onChange={(event) => setSequenceInput(event.target.value)}
+                                value={sequence}
+                                onChange={(event) => onSequenceChange(event.target.value)}
                             />
                         </div>
                     </label>
