@@ -53,6 +53,8 @@ export interface GenomeSequence {
   name: string;
   sequence: string;
   length_bp: number;
+  // Some responses may provide total length as `length`; keep optional for compatibility.
+  length?: number;
   // UI helper fields (optional)
   tracks?: any[];
 }
