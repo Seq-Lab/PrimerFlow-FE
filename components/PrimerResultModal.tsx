@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import GenomeCanvas from "@/components/canvas/GenomeCanvas";
+import GenomeCanvas from "./canvas/GenomeCanvas";
 import type {
   GenomeCanvasViewState,
   GenomeData,

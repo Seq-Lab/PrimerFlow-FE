@@ -73,6 +73,10 @@ export interface PrimerCandidate {
 }
 
 export interface PrimerDesignResponse {
+  // Optional analysis summary fields (used by UI in mock/preview modes).
+  result?: string;
+  score?: number;
+  details?: unknown;
   genome: GenomeSequence;
   candidates: PrimerCandidate[];
   meta: {
