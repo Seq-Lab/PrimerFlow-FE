@@ -4,11 +4,8 @@ const nextConfig: NextConfig = {
     // ... 기타 설정들 ...
 
     async rewrites() {
-        // BACKEND_ORIGIN > BACKEND_URL > 로컬(8000) 우선순위로 백엔드 목적지를 결정
-        const backendUrl =
-            process.env.BACKEND_ORIGIN ||
-            process.env.BACKEND_URL ||
-            "http://127.0.0.1:8000";
+        // BACKEND_URL 값이 없으면 로컬(8000)로 연결
+        const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:8000";
 
         return [
             {
