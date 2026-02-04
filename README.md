@@ -76,9 +76,19 @@ cd PrimerFlow-FE
 npm install
 
 # 4. 환경 변수 설정 (.env.local 생성)
-# 현재는 별도 API 기본 URL이 필요하지 않습니다. 파일은 비워 두거나 로컬 오버라이드용으로만 사용하세요.
+- Next.js `rewrites`에서 백엔드 목적지는 `BACKEND_ORIGIN` → `BACKEND_URL` → `http://127.0.0.1:8000` 순으로 사용됩니다.
+- 로컬 기본값(127.0.0.1:8000)이면 `.env.local`을 비워 두어도 무방합니다.
+- 다른 백엔드로 프록시해야 한다면 `.env.local`에 아래처럼 설정하세요:
+
+```env
+BACKEND_ORIGIN=https://api.example.com   # 권장 키
+# 또는 BACKEND_URL=https://api.example.com
+```
+
+- Vercel 등 배포 환경에서도 동일한 환경 변수를 프로젝트 환경 변수로 추가하면 됩니다.
 
 # 5. 개발 서버 실행
+```
 npm run dev
 ```
 

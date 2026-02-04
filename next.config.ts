@@ -4,13 +4,16 @@ const nextConfig: NextConfig = {
     // ... 기타 설정들 ...
 
     async rewrites() {
+        // BACKEND_ORIGIN > BACKEND_URL > 로컬(8000) 우선순위로 백엔드 목적지를 결정
+        const backendUrl =
+            process.env.BACKEND_ORIGIN ||
+            process.env.BACKEND_URL ||
+            "http://127.0.0.1:8000";
+
         return [
             {
-                // 1. 프론트엔드 코드에서 보내는 주소 (건드리지 않음)
-                source: "/api/v1/primer/design",
-
-                // 2. 실제 백엔드가 기다리는 주소 (Swagger에서 본 그 주소!)
-                destination: "http://127.0.0.1:8000/design",
+                source: "/api/v1/:path*",
+                destination: `${backendUrl}/:path*`, // 여기를 변수로 변경
             },
         ];
     },
