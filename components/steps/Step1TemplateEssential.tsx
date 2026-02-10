@@ -30,7 +30,6 @@ const countAlphabeticChars = (value: string) => {
     return count;
 };
 
-const LARGE_SEQUENCE_THRESHOLD = 50_000;
 const COUNT_DELAY_SMALL_MS = 80;
 const COUNT_DELAY_LARGE_MS = 240;
 const MAX_EDITOR_CHARS = 30_000;
@@ -66,12 +65,9 @@ export default function Step1TemplateEssential({
         }
     };
 
-    const scheduleCount = (value: string) => {
+    const scheduleCount = (value: string, isLargeSequence: boolean) => {
         clearPendingCountTimer();
-        const delay =
-            value.length >= LARGE_SEQUENCE_THRESHOLD
-                ? COUNT_DELAY_LARGE_MS
-                : COUNT_DELAY_SMALL_MS;
+        const delay = isLargeSequence ? COUNT_DELAY_LARGE_MS : COUNT_DELAY_SMALL_MS;
 
         countTimeoutRef.current = window.setTimeout(() => {
             setBasePairCount(countAlphabeticChars(value));
@@ -96,7 +92,7 @@ export default function Step1TemplateEssential({
             setBasePairCount(countAlphabeticChars(value));
             return;
         }
-        scheduleCount(value);
+        scheduleCount(value, nextIsLargeSequence);
     };
 
     useEffect(
