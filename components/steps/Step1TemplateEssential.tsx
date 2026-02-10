@@ -155,6 +155,11 @@ export default function Step1TemplateEssential({
     };
 
     const handleTextareaPaste = (event: ClipboardEvent<HTMLTextAreaElement>) => {
+        if (isLargeSequenceMode || event.currentTarget.readOnly) {
+            event.preventDefault();
+            return;
+        }
+
         event.preventDefault();
 
         const pastedText = event.clipboardData.getData("text");
@@ -175,6 +180,11 @@ export default function Step1TemplateEssential({
             textareaRef.current.selectionStart = cursor;
             textareaRef.current.selectionEnd = cursor;
         }
+    };
+
+    const handleTextareaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+        if (isLargeSequenceMode || event.currentTarget.readOnly) return;
+        updateSequence(event.currentTarget.value);
     };
 
     const handleCleanClick = () => {
@@ -214,7 +224,7 @@ export default function Step1TemplateEssential({
                                 spellCheck={false}
                                 readOnly={isLargeSequenceMode}
                                 defaultValue={getPreviewValue(sequenceRef.current)}
-                                onChange={(event) => updateSequence(event.target.value)}
+                                onChange={handleTextareaChange}
                                 onPaste={handleTextareaPaste}
                             />
                         </div>
