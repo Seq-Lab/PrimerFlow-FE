@@ -32,6 +32,7 @@ export default function WizardHeader({
                         <Image
                             src="/primer.jpg"
                             alt="PrimerFlow"
+                            sizes="64px"
                             fill
                             className="object-contain"
                             priority
